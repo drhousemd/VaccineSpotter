@@ -35,7 +35,6 @@ public class BackgroundWorker extends Worker {
             calendar.add(Calendar.DATE, 7);
             date = dateFormat.format(calendar.getTime());
         }
-
-        return null;
+        return Result.success();
     }
 }

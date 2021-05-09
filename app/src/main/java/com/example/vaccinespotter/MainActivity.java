@@ -14,9 +14,9 @@ import com.example.vaccinespotter.worker.BackgroundWorker;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
-    public static Long REPEAT_INTERVAL = 15L;
-    public static TimeUnit REPEAT_INTERVAL_UNIT = TimeUnit.MINUTES;
-    public static String workerTag = "VaccineWorkerTag";
+    public static final Long REPEAT_INTERVAL = 15L;
+    public static final TimeUnit REPEAT_INTERVAL_UNIT = TimeUnit.MINUTES;
+    public static final String workerTag = "VaccineWorkerTag";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
