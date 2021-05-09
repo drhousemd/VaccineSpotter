@@ -18,8 +18,12 @@ public class Session {
         return available_capacity;
     }
 
-    public Date getDate() throws ParseException {
-        return  new SimpleDateFormat("dd-MM-yyyy").parse(date);
+    public Date getDate() {
+        try {
+            return new SimpleDateFormat("dd-MM-yyyy").parse(date);
+        } catch (ParseException e) {
+            return new Date();
+        }
     }
 
     public int getMin_age_limit() {

@@ -8,6 +8,11 @@ import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
+import com.example.vaccinespotter.apiinterface.VaccineSlots;
+import com.example.vaccinespotter.models.Center;
+import com.example.vaccinespotter.models.CenterBase;
+import com.example.vaccinespotter.models.Centers;
+import com.example.vaccinespotter.models.NotificationModel;
 
 import com.example.vaccinespotter.worker.BackgroundWorker;
 
@@ -22,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        VaccineNotificationManager notificationManager = new VaccineNotificationManager(getApplicationContext());
+        notificationManager.registerNotifications();
 
         PeriodicWorkRequest queryWorkRequest =
                 new PeriodicWorkRequest.Builder(BackgroundWorker.class, REPEAT_INTERVAL, REPEAT_INTERVAL_UNIT)
