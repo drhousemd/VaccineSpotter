@@ -6,7 +6,6 @@ import java.util.Locale;
 public class NotificationModel {
 
     private CenterBase centerDetails;
-
     private Session session;
 
     public CenterBase getCenterDetails() {
