@@ -1,6 +1,7 @@
 package com.example.vaccinespotter.models;
 
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class NotificationModel {
 
@@ -22,7 +23,7 @@ public class NotificationModel {
     }
 
     public String getNotificationText() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
         String strDate = dateFormat.format(session.getDate());
         return  String.format("Center name: %s %s Vaccine: %s for Age %s, available slots: %s on %s", centerDetails.name, centerDetails.pincode, session.getVaccine(), session.getMin_age_limit(), session.getAvailable_capacity(), strDate);
     }
@@ -51,11 +52,11 @@ public class NotificationModel {
 
     private boolean compareCentre(NotificationModel model) {
         return model.centerDetails.pincode == centerDetails.pincode
-            && model.centerDetails.name == centerDetails.name;
+            && model.centerDetails.name.equals(centerDetails.name);
     }
 
     private boolean compareSession(NotificationModel model) {
-        return model.session.getVaccine() == session.getVaccine()
+        return model.session.getVaccine().equals(session.getVaccine())
             && model.session.getDate().compareTo(session.getDate()) == 0;
     }
 }

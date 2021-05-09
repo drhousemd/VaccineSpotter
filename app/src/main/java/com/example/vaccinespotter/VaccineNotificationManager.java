@@ -62,7 +62,6 @@ public class VaccineNotificationManager {
 
         NotificationManager manager = mContext.getSystemService(NotificationManager.class);
 
-
         Notification notification = notificationBuilder.build();
         manager.notify(VACCINE_AVAILABLE, mNotificationId++, notification);
     }

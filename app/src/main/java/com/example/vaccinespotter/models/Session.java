@@ -3,6 +3,7 @@ package com.example.vaccinespotter.models;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class Session {
 
@@ -20,7 +21,7 @@ public class Session {
 
     public Date getDate() {
         try {
-            return new SimpleDateFormat("dd-MM-yyyy").parse(date);
+            return new SimpleDateFormat("dd-MM-yyyy", Locale.US).parse(date);
         } catch (ParseException e) {
             return new Date();
         }
