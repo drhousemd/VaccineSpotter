@@ -1,60 +1,42 @@
 package com.example.vaccinespotter;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-import android.widget.Toast;
 
-import com.example.vaccinespotter.apiinterface.VaccineSlots;
-import com.example.vaccinespotter.models.Center;
-import com.example.vaccinespotter.models.CenterBase;
-import com.example.vaccinespotter.models.Centers;
-import com.example.vaccinespotter.models.NotificationModel;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import com.example.vaccinespotter.worker.BackgroundWorker;
+
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
+    public static final Long REPEAT_INTERVAL = 15L;
+    public static final TimeUnit REPEAT_INTERVAL_UNIT = TimeUnit.MINUTES;
+    public static final String WORKER_TAG = "VaccineWorkerTag";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        VaccineNotificationManager notificationManager = new VaccineNotificationManager(getApplicationContext());
-        notificationManager.registerNotifications();
 
-        Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("https://cdn-api.co-vin.in")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
 
-        VaccineSlots vaccineSlots = retrofit.create(VaccineSlots.class);
+        PeriodicWorkRequest queryWorkRequest =
+                new PeriodicWorkRequest.Builder(BackgroundWorker.class, REPEAT_INTERVAL, REPEAT_INTERVAL_UNIT)
+                        .addTag(WORKER_TAG)
+                        .setConstraints(constraints)
+                        .build();
 
-        Call<Centers> call = vaccineSlots.getCenters(312, "15-05-2021");
-
-        call.enqueue(new Callback<Centers>() {
-            @Override
-            public void onResponse(Call<Centers> call, Response<Centers> response) {
-                if (response.isSuccessful()) {
-                    // This contains the response.
-                    Centers centers = response.body();
-                    Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
-                    Center center = centers.getCenters().get(0);
-                    notificationManager.notifyUser(new NotificationModel((CenterBase) center, center.getSessions()[0]));
-                    notificationManager.notifyUser(new NotificationModel((CenterBase) center, center.getSessions()[0]));
-
-                    notificationManager.notifyUser(new NotificationModel((CenterBase) center, center.getSessions()[0]));
-
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Centers> call, Throwable t) {
-
-            }
-        });
+        WorkManager.getInstance(getApplicationContext())
+                .enqueueUniquePeriodicWork(
+                        WORKER_TAG,
+                        ExistingPeriodicWorkPolicy.KEEP,
+                        queryWorkRequest);
     }
 }
