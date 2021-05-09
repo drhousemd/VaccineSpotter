@@ -1,4 +1,4 @@
-package com.example.vaccinespotter;
+package com.example.vaccinespotter.notifications;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -8,6 +8,7 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.example.vaccinespotter.R;
 import com.example.vaccinespotter.models.NotificationModel;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.List;
 public class VaccineNotificationManager {
 
     private final String VACCINE_AVAILABLE = "Vaccine available";
+    private final String QUERY_TO_COWIN_FAILED = "Query to Cowin site Failed";
 
     private final String TAG = "VaccineNotificationManager";
 
@@ -51,19 +53,33 @@ public class VaccineNotificationManager {
         String channelId = NotificationHelper.getChannelId(mContext);
 
         // 2
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mContext, channelId)
+        Notification notification = new NotificationCompat.Builder(mContext, channelId)
             .setSmallIcon(R.drawable.ic_launcher_background)
             .setContentTitle(VACCINE_AVAILABLE)
             .setContentText(text)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setStyle(new NotificationCompat.BigTextStyle()
                 .bigText(text))
-            .setAutoCancel(false);
+            .setAutoCancel(false)
+            .build();
 
         NotificationManager manager = mContext.getSystemService(NotificationManager.class);
-
-        Notification notification = notificationBuilder.build();
         manager.notify(VACCINE_AVAILABLE, mNotificationId++, notification);
+    }
+
+    public void notificationForFailure(String failureText) {
+        String channelId = NotificationHelper.getChannelId(mContext);
+        Notification notification = new NotificationCompat.Builder(mContext, channelId)
+                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setContentTitle(QUERY_TO_COWIN_FAILED)
+                .setContentText(failureText)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText(failureText))
+                .setAutoCancel(false)
+                .build();
+
+        mContext.getSystemService(NotificationManager.class).notify(QUERY_TO_COWIN_FAILED, mNotificationId++, notification);
     }
 }
 

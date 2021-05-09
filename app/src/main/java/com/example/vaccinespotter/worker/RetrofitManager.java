@@ -1,7 +1,9 @@
-package com.example.vaccinespotter;
+package com.example.vaccinespotter.worker;
 
 import android.content.Context;
 import android.util.Log;
+
+import com.example.vaccinespotter.notifications.VaccineNotificationManager;
 import com.example.vaccinespotter.apiinterface.VaccineSlots;
 import com.example.vaccinespotter.models.Center;
 import com.example.vaccinespotter.models.Centers;
