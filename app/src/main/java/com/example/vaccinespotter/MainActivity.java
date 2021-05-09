@@ -7,7 +7,9 @@ import android.widget.Toast;
 
 import com.example.vaccinespotter.apiinterface.VaccineSlots;
 import com.example.vaccinespotter.models.Center;
+import com.example.vaccinespotter.models.CenterBase;
 import com.example.vaccinespotter.models.Centers;
+import com.example.vaccinespotter.models.NotificationModel;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -15,21 +17,14 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        VaccineNotificationManager notificationManager = new VaccineNotificationManager(getApplicationContext());
+        notificationManager.registerNotifications();
 
         Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("https://cdn-api.co-vin.in")
@@ -47,6 +42,12 @@ public class MainActivity extends AppCompatActivity {
                     // This contains the response.
                     Centers centers = response.body();
                     Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
+                    Center center = centers.getCenters().get(0);
+                    notificationManager.notifyUser(new NotificationModel((CenterBase) center, center.getSessions()[0]));
+                    notificationManager.notifyUser(new NotificationModel((CenterBase) center, center.getSessions()[0]));
+
+                    notificationManager.notifyUser(new NotificationModel((CenterBase) center, center.getSessions()[0]));
+
                 }
             }
 
