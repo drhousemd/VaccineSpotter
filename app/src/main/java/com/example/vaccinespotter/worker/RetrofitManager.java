@@ -26,19 +26,20 @@ public class RetrofitManager {
 
     private final VaccineSlots mVaccineSlots = mRetrofit.create(VaccineSlots.class);
 
-    public List<NotificationModel> queryCowin(VaccineNotificationManager notificationManager, Context context, String date) throws IOException {
+    public List<NotificationModel> queryCowin(String date) throws IOException {
         List<NotificationModel> notificationModels = new ArrayList<NotificationModel>();
         Call<Centers> call = mVaccineSlots.getCenters(DISTRICT_ID, date);
         Response<Centers> response = call.execute();
         assert response.body() != null;
-        List<Center> centers = response.body().getCenters();
-        for (Center center: centers) {
+
+        for (Center center: response.body().getCenters()) {
             for (Session session: center.getSessions()) {
                 if(session.isFor18YearsPlus() && session.isVaccineAvailable()) {
                     notificationModels.add(new NotificationModel(center, session));
                 }
             }
         }
+
         return notificationModels;
     }
 }

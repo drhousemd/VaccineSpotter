@@ -33,10 +33,10 @@ public class Session {
     }
 
     public boolean isVaccineAvailable() {
-        return (available_capacity != 0);
+        return available_capacity != 0;
     }
 
     public boolean isFor18YearsPlus() {
-        return (min_age_limit == AGE_18);
+        return min_age_limit == AGE_18;
     }
 }

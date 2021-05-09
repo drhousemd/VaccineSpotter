@@ -13,24 +13,32 @@ import java.util.List;
 
 public class VaccineNotificationManager {
 
+    private final static int MAX_CHARACTERS_EXCEPTION_STRING = 100;
     private final String VACCINE_AVAILABLE = "Vaccine available";
     private final String TAG = "VaccineNotificationManager";
     private int mNotificationId;
     private final Context mContext;
     private List<NotificationModel> sentNotifications;
+    private boolean mRegisteredNotification = false;
 
     public VaccineNotificationManager(Context context) {
         mContext = context;
-        sentNotifications = new ArrayList<NotificationModel>();
+        sentNotifications = new ArrayList<>();
     }
 
     public void registerNotifications() {
-        NotificationHelper.createNotificationChannel(mContext,
-            NotificationManagerCompat.IMPORTANCE_DEFAULT, false,
-            mContext.getString(R.string.app_name), "Vaccine Spotter App notification channel.");
+        if (!mRegisteredNotification) {
+            NotificationHelper.createNotificationChannel(mContext,
+                NotificationManagerCompat.IMPORTANCE_DEFAULT, false,
+                mContext.getString(R.string.app_name), "Vaccine Spotter App notification channel.");
+            mRegisteredNotification = true;
+        }
     }
 
     public void showNotifications(List<NotificationModel> models) {
+        if (models == null)
+            return;
+
         for (NotificationModel model : models) {
             notifyUser(model);
         }
@@ -63,6 +71,8 @@ public class VaccineNotificationManager {
 
     public void notificationForFailure(String failureText, String exception) {
         String channelId = NotificationHelper.getChannelId(mContext);
+        exception = exception.substring(0, MAX_CHARACTERS_EXCEPTION_STRING);
+
         Notification notification = new NotificationCompat.Builder(mContext, channelId)
                 .setSmallIcon(R.drawable.ic_launcher_background)
                 .setContentTitle(failureText)
