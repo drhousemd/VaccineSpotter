@@ -22,7 +22,7 @@ public class BackgroundWorker extends Worker {
     private static final int NUMBER_OF_CYCLES = 5;
     private static final int NUMBER_OF_DAYS_IN_CYCLE = 7;
     private static final String QUERY_COWIN_FAILED = "Querying the CoWin website failed";
-    private static final String SEND_NOTIFICATION_FAILED = "Failed in sending the notificatio to user";
+    private static final String SEND_NOTIFICATION_FAILED = "Failed in sending the notification to user";
 
     private final VaccineNotificationManager mNotificationManager;
 
