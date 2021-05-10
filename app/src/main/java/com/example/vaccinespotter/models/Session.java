@@ -7,6 +7,8 @@ import java.util.Locale;
 
 public class Session {
     private static final int AGE_18 = 18;
+    private static final String COVISHIELD = "COVISHIELD";
+
     private int available_capacity;
     private String date;
     private int min_age_limit;
@@ -38,5 +40,9 @@ public class Session {
 
     public boolean isFor18YearsPlus() {
         return min_age_limit == AGE_18;
+    }
+
+    public boolean isCovishield() {
+        return vaccine == COVISHIELD
     }
 }

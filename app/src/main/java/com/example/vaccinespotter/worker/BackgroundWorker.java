@@ -9,10 +9,14 @@ import androidx.work.WorkerParameters;
 
 import com.example.vaccinespotter.models.NotificationModel;
 import com.example.vaccinespotter.notifications.VaccineNotificationManager;
+import com.example.vaccinespotter.requirement.AnyVaxAvailable18PlusRequirement;
+import com.example.vaccinespotter.requirement.Requirement;
+import com.example.vaccinespotter.requirement.CoviShieldAvailable45PlusRequirement;
 
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -25,6 +29,7 @@ public class BackgroundWorker extends Worker {
     private static final String SEND_NOTIFICATION_FAILED = "Failed in sending the notification to user";
 
     private final VaccineNotificationManager mNotificationManager;
+    private final ArrayList<Requirement> requirements;
 
     public BackgroundWorker(
         Context context,
@@ -32,6 +37,10 @@ public class BackgroundWorker extends Worker {
         super(context, workerParams);
         mNotificationManager = new VaccineNotificationManager(getApplicationContext());
         mNotificationManager.registerNotifications();
+        requirements = new ArrayList<>();
+
+        requirements.add(new AnyVaxAvailable18PlusRequirement(7));
+        requirements.add(new CoviShieldAvailable45PlusRequirement(3));
     }
 
     @NonNull
@@ -45,20 +54,28 @@ public class BackgroundWorker extends Worker {
         String date = dateFormat.format(calendar.getTime());
         List<NotificationModel> models = null;
 
-        for (int cycles = 0; cycles < NUMBER_OF_CYCLES; cycles++) {
-            try {
-                models = retrofitManager.queryCowin(date);
-                mNotificationManager.showNotifications(models);
-                calendar.add(Calendar.DATE, NUMBER_OF_DAYS_IN_CYCLE);
-                date = dateFormat.format(calendar.getTime());
-            } catch (IOException exception) {
-                Log.e(TAG, "Exception in Query Cowin", exception);
-                mNotificationManager.notificationForFailure(QUERY_COWIN_FAILED, exception.toString());
-                failed = true;
-            } catch (Exception exception) {
-                Log.e(TAG, "Exception in Sending Notification", exception);
-                mNotificationManager.notificationForFailure(SEND_NOTIFICATION_FAILED, exception.toString());
-                failed = true;
+        for (Requirement requirement : requirements) {
+            for (int cycles = 0; cycles < requirement.getRangeForSearchLimit(); cycles++) {
+                try {
+                    models = retrofitManager.queryCowin(date);
+
+                    for (NotificationModel model : models) {
+                        if (requirement.isRequirementSatisfied(model)) {
+                            mNotificationManager.showNotifications(models);
+                        }
+                    }
+
+                    calendar.add(Calendar.DATE, NUMBER_OF_DAYS_IN_CYCLE);
+                    date = dateFormat.format(calendar.getTime());
+                } catch (IOException exception) {
+                    Log.e(TAG, "Exception in Query Cowin", exception);
+                    mNotificationManager.notificationForFailure(QUERY_COWIN_FAILED, exception.toString());
+                    failed = true;
+                } catch (Exception exception) {
+                    Log.e(TAG, "Exception in Sending Notification", exception);
+                    mNotificationManager.notificationForFailure(SEND_NOTIFICATION_FAILED, exception.toString());
+                    failed = true;
+                }
             }
         }
 
