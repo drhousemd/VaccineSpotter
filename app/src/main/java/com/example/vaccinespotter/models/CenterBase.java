@@ -1,6 +1,8 @@
 package com.example.vaccinespotter.models;
 
-public class CenterBase {
+import java.io.Serializable;
+
+public class CenterBase implements Serializable {
     protected String address;
     protected String block_name;
     protected int center_id;

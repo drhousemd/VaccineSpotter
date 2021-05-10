@@ -1,11 +1,12 @@
 package com.example.vaccinespotter.models;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class Session {
+public class Session implements Serializable {
     private static final int AGE_18 = 18;
     private static final int AGE_45 = 45;
 
