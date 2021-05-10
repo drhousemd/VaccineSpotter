@@ -54,28 +54,38 @@ public class BackgroundWorker extends Worker {
         String date = dateFormat.format(calendar.getTime());
         List<NotificationModel> models = null;
 
-        for (Requirement requirement : requirements) {
-            for (int cycles = 0; cycles < requirement.getRangeForSearchLimit(); cycles++) {
-                try {
-                    models = retrofitManager.queryCowin(date);
+        int range = 0;
 
-                    for (NotificationModel model : models) {
-                        if (requirement.isRequirementSatisfied(model)) {
-                            mNotificationManager.showNotifications(models);
+        // Extract max range out of all requirements.
+        for (Requirement requirement : requirements) {
+            range = requirement.getRangeForSearchLimit() > range ? requirement.getRangeForSearchLimit() : range;
+        }
+
+        for (int cycles = 0; cycles < range; cycles++) {
+            try {
+                models = retrofitManager.queryCowin(date);
+
+                for (Requirement requirement : requirements) {
+                    // Check if this range is valid for current requirement.
+                    if (range <= requirement.getRangeForSearchLimit()) {
+                        for (NotificationModel model : models) {
+                            if (requirement.isRequirementSatisfied(model)) {
+                                mNotificationManager.showNotifications(models);
+                            }
                         }
                     }
-
-                    calendar.add(Calendar.DATE, NUMBER_OF_DAYS_IN_CYCLE);
-                    date = dateFormat.format(calendar.getTime());
-                } catch (IOException exception) {
-                    Log.e(TAG, "Exception in Query Cowin", exception);
-                    mNotificationManager.notificationForFailure(QUERY_COWIN_FAILED, exception.toString());
-                    failed = true;
-                } catch (Exception exception) {
-                    Log.e(TAG, "Exception in Sending Notification", exception);
-                    mNotificationManager.notificationForFailure(SEND_NOTIFICATION_FAILED, exception.toString());
-                    failed = true;
                 }
+
+                calendar.add(Calendar.DATE, NUMBER_OF_DAYS_IN_CYCLE);
+                date = dateFormat.format(calendar.getTime());
+            } catch (IOException exception) {
+                Log.e(TAG, "Exception in Query Cowin", exception);
+                mNotificationManager.notificationForFailure(QUERY_COWIN_FAILED, exception.toString());
+                failed = true;
+            } catch (Exception exception) {
+                Log.e(TAG, "Exception in Sending Notification", exception);
+                mNotificationManager.notificationForFailure(SEND_NOTIFICATION_FAILED, exception.toString());
+                failed = true;
             }
         }
 
