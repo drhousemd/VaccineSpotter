@@ -49,6 +49,7 @@ public class BackgroundWorker extends Worker {
     @Override
     public Result doWork() {
         boolean failed = false;
+        mNotificationManager.loadData();
         RetrofitManager retrofitManager = new RetrofitManager();
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
         Calendar calendar = Calendar.getInstance();
@@ -89,6 +90,8 @@ public class BackgroundWorker extends Worker {
                 failed = true;
             }
         }
+
+        mNotificationManager.storeData();
 
         return failed ? Result.failure() : Result.success();
     }

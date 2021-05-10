@@ -4,26 +4,38 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.util.Log;
+
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+
 import com.example.vaccinespotter.R;
 import com.example.vaccinespotter.models.NotificationModel;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class VaccineNotificationManager {
 
+    private final static String FILE_NAME = "data.dat";
     private final static int MAX_CHARACTERS_EXCEPTION_STRING = 100;
     private final String VACCINE_AVAILABLE = "Vaccine available";
     private final String TAG = "VaccineNotificationManager";
-    private int mNotificationId;
     private final Context mContext;
-    private List<NotificationModel> sentNotifications;
+    private int mNotificationId;
+    private List<NotificationModel> mSentNotifications;
     private boolean mRegisteredNotification = false;
 
     public VaccineNotificationManager(Context context) {
         mContext = context;
-        sentNotifications = new ArrayList<>();
+        mSentNotifications = new ArrayList<>();
+        mNotificationId = (int) System.currentTimeMillis();
     }
 
     public void registerNotifications() {
@@ -45,13 +57,80 @@ public class VaccineNotificationManager {
     }
 
     public void notifyUser(NotificationModel model) {
-        if (sentNotifications.contains(model)) {
+        if (mSentNotifications.contains(model)) {
             Log.d(TAG, String.format("Notification already sent for Center name %s and session %s ", model.getCenterDetails().getName(), model.getSession().getDate().toString()));
             return;
         }
 
-        sentNotifications.add(model);
+        mSentNotifications.add(model);
         createNotification(model);
+    }
+
+    public void loadData() {
+        File outFile = new File(mContext.getFilesDir(), FILE_NAME);
+        if (!outFile.exists()) {
+            return;
+        }
+
+        ObjectInput objectInput = null;
+        FileInputStream fileInputStream = null;
+
+        try {
+            fileInputStream = new FileInputStream(outFile);
+            objectInput = new ObjectInputStream(fileInputStream);
+            mSentNotifications = (List<NotificationModel>) objectInput.readObject();
+            objectInput.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (objectInput != null) {
+                try {
+                    objectInput.close();
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                }
+            }
+            if (fileInputStream != null) {
+                try {
+                    fileInputStream.close();
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void storeData() {
+        FileOutputStream fileOutputStream = null;
+        ObjectOutputStream objectOutputStream = null;
+
+        try {
+            File outFile = new File(mContext.getFilesDir(), FILE_NAME);
+            fileOutputStream = new FileOutputStream(outFile);
+            objectOutputStream = new ObjectOutputStream(fileOutputStream);
+
+            objectOutputStream.writeObject(mSentNotifications);
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+
+            if (fileOutputStream != null) {
+                try {
+                    fileOutputStream.close();
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                }
+            }
+
+            if (objectOutputStream != null) {
+                try {
+                    objectOutputStream.close();
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                }
+            }
+        }
     }
 
     private void createNotification(NotificationModel model) {
@@ -73,17 +152,17 @@ public class VaccineNotificationManager {
 
     public void notificationForFailure(String failureText, String exception) {
         String channelId = NotificationHelper.getChannelId(mContext);
-        exception = exception.substring(0, MAX_CHARACTERS_EXCEPTION_STRING);
+        exception = exception.length() > MAX_CHARACTERS_EXCEPTION_STRING ? exception.substring(0, MAX_CHARACTERS_EXCEPTION_STRING) : exception;
 
         Notification notification = new NotificationCompat.Builder(mContext, channelId)
-                .setSmallIcon(R.drawable.ic_launcher_background)
-                .setContentTitle(failureText)
-                .setContentText(exception)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(failureText))
-                .setAutoCancel(false)
-                .build();
+            .setSmallIcon(R.drawable.ic_launcher_background)
+            .setContentTitle(failureText)
+            .setContentText(exception)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setStyle(new NotificationCompat.BigTextStyle()
+                .bigText(failureText))
+            .setAutoCancel(false)
+            .build();
 
         mContext.getSystemService(NotificationManager.class).notify(failureText, mNotificationId++, notification);
     }

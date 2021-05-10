@@ -1,9 +1,10 @@
 package com.example.vaccinespotter.models;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class NotificationModel {
+public class NotificationModel implements Serializable {
 
     private CenterBase centerDetails;
     private Session session;
@@ -56,6 +57,6 @@ public class NotificationModel {
 
     private boolean compareSession(NotificationModel model) {
         return model.session.getVaccine().equals(session.getVaccine())
-            && model.session.getDate().compareTo(session.getDate()) == 0;
+            && model.session.getDateString().equals(session.getDateString());
     }
 }
