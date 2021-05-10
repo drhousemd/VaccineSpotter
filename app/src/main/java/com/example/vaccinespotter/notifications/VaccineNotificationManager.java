@@ -51,14 +51,16 @@ public class VaccineNotificationManager {
         }
 
         sentNotifications.add(model);
-        createNotification(model.getNotificationText());
+        createNotification(model);
     }
 
-    private void createNotification(String text) {
+    private void createNotification(NotificationModel model) {
+        String text = model.getNotificationText();
+        String title = String.format("%s for %s on %s", VACCINE_AVAILABLE, model.getSession().getMin_age_limit(), model.getSession().getDateString());
         String channelId = NotificationHelper.getChannelId(mContext);
         Notification notification = new NotificationCompat.Builder(mContext, channelId)
             .setSmallIcon(R.drawable.ic_launcher_background)
-            .setContentTitle(VACCINE_AVAILABLE)
+            .setContentTitle(title)
             .setContentText(text)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setStyle(new NotificationCompat.BigTextStyle()

@@ -10,7 +10,7 @@ public class CoviShieldAvailable45PlusRequirement extends Requirement {
 
     @Override
     public boolean isRequirementSatisfied(NotificationModel notificationModel) {
-        return !notificationModel.getSession().isFor18YearsPlus()
+        return notificationModel.getSession().minAgeLimitIs45()
             && notificationModel.getSession().isCovishield()
             && super.isRequirementSatisfied(notificationModel);
     }

@@ -10,7 +10,7 @@ public class AnyVaxAvailable18PlusRequirement extends Requirement {
 
     @Override
     public boolean isRequirementSatisfied(NotificationModel notificationModel) {
-        return notificationModel.getSession().isFor18YearsPlus()
+        return notificationModel.getSession().minAgeLimitIs18()
             && super.isRequirementSatisfied(notificationModel);
     }
 }

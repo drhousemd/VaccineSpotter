@@ -23,7 +23,8 @@ import java.util.Locale;
 
 public class BackgroundWorker extends Worker {
     private static final String TAG = "BackgroundWorker";
-    private static final int NUMBER_OF_CYCLES = 5;
+    private static final int WEEKS_FOR_18_PLUS = 7;
+    private static final int WEEKS_FOR_45_PLUS = 3;
     private static final int NUMBER_OF_DAYS_IN_CYCLE = 7;
     private static final String QUERY_COWIN_FAILED = "Querying the CoWin website failed";
     private static final String SEND_NOTIFICATION_FAILED = "Failed in sending the notification to user";
@@ -39,8 +40,8 @@ public class BackgroundWorker extends Worker {
         mNotificationManager.registerNotifications();
         requirements = new ArrayList<>();
 
-        requirements.add(new AnyVaxAvailable18PlusRequirement(7));
-        requirements.add(new CoviShieldAvailable45PlusRequirement(3));
+        requirements.add(new AnyVaxAvailable18PlusRequirement(WEEKS_FOR_18_PLUS));
+        requirements.add(new CoviShieldAvailable45PlusRequirement(WEEKS_FOR_45_PLUS));
     }
 
     @NonNull
