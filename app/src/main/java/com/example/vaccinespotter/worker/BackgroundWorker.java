@@ -61,16 +61,16 @@ public class BackgroundWorker extends Worker {
             range = requirement.getRangeForSearchLimit() > range ? requirement.getRangeForSearchLimit() : range;
         }
 
-        for (int cycles = 0; cycles < range; cycles++) {
+        for (int cycle = 0; cycle < range; cycle++) {
             try {
                 models = retrofitManager.queryCowin(date);
 
                 for (Requirement requirement : requirements) {
                     // Check if this range is valid for current requirement.
-                    if (range <= requirement.getRangeForSearchLimit()) {
+                    if (cycle <= requirement.getRangeForSearchLimit()) {
                         for (NotificationModel model : models) {
                             if (requirement.isRequirementSatisfied(model)) {
-                                mNotificationManager.showNotifications(models);
+                                mNotificationManager.notifyUser(model);
                             }
                         }
                     }

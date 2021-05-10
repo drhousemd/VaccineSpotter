@@ -43,6 +43,6 @@ public class Session {
     }
 
     public boolean isCovishield() {
-        return vaccine == COVISHIELD
+        return vaccine.equals(COVISHIELD);
     }
 }
